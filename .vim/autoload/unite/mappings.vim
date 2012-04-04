@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: mappings.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 23 Nov 2011.
+" Last Modified: 31 Mar 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -39,7 +39,8 @@ function! unite#mappings#define_default_mappings()"{{{
   nnoremap <expr><buffer> <Plug>(unite_insert_enter)
         \ <SID>insert_enter('i')
   nnoremap <expr><buffer> <Plug>(unite_insert_head)
-        \ <SID>insert_enter('0'.(len(unite#get_current_unite().prompt)-1).'li')
+        \ <SID>insert_enter('A'.
+        \  (repeat("\<Left>", len(substitute(unite#get_input(), '.', 'x', 'g')))))
   nnoremap <expr><buffer> <Plug>(unite_append_enter)
         \ <SID>insert_enter('a')
   nnoremap <expr><buffer> <Plug>(unite_append_end)
@@ -139,16 +140,18 @@ function! unite#mappings#define_default_mappings()"{{{
         \ <C-o>:<C-u>call <SID>input_directory()<CR>
   inoremap <silent><buffer><expr> <Plug>(unite_do_default_action)
         \ unite#do_action(unite#get_current_unite().context.default_action)
-  inoremap <buffer><silent> <Plug>(unite_toggle_transpose_window)
+  inoremap <silent><buffer> <Plug>(unite_toggle_transpose_window)
         \ <C-o>:<C-u>call <SID>toggle_transpose_window()<CR>
-  inoremap <buffer><silent> <Plug>(unite_toggle_auto_preview)
+  inoremap <silent><buffer> <Plug>(unite_toggle_auto_preview)
         \ <C-o>:<C-u>call <SID>toggle_auto_preview()<CR>
-  inoremap <buffer><silent> <Plug>(unite_narrowing_path)
+  inoremap <silent><buffer> <Plug>(unite_narrowing_path)
         \ <C-o>:<C-u>call <SID>narrowing_path()<CR>
-  inoremap <buffer><silent> <Plug>(unite_narrowing_input_history)
+  inoremap <silent><buffer> <Plug>(unite_narrowing_input_history)
         \ <C-o>:<C-u>call <SID>narrowing_input_history()<CR>
-  inoremap <buffer><silent> <Plug>(unite_toggle_max_candidates)
+  inoremap <silent><buffer> <Plug>(unite_toggle_max_candidates)
         \ <C-o>:<C-u>call <SID>toggle_max_candidates()<CR>
+  inoremap <silent><buffer> <Plug>(unite_redraw)
+        \ <C-o>:<C-u>call <SID>redraw()<CR>
   "}}}
 
   if exists('g:unite_no_default_keymappings') && g:unite_no_default_keymappings
@@ -218,6 +221,7 @@ function! unite#mappings#define_default_mappings()"{{{
   imap <buffer> <C-w>     <Plug>(unite_delete_backward_word)
   imap <buffer> <C-a>     <Plug>(unite_move_head)
   imap <buffer> <Home>    <Plug>(unite_move_head)
+  imap <buffer> <C-l>     <Plug>(unite_redraw)
 
   inoremap <silent><buffer><expr> d
         \ unite#smart_map('d', unite#do_action('delete'))
@@ -301,7 +305,19 @@ function! unite#mappings#do_action(action_name, ...)"{{{
       let is_quit = 1
     endif
 
-    call add(_, table.action.func(table.candidates))
+    try
+      call add(_, table.action.func(table.candidates))
+    catch /^Vim\%((\a\+)\)\=:E325/
+      " Ignore catch.
+      call unite#print_error(v:exception)
+      call unite#print_error('Attenssion: Swap file is found in executing action!')
+      call unite#print_error('Action name is ' . table.action.name)
+    catch
+      call unite#print_error(v:throwpoint)
+      call unite#print_error(v:exception)
+      call unite#print_error('Error occured in executing action!')
+      call unite#print_error('Action name is ' . table.action.name)
+    endtry
 
     " Check invalidate cache flag.
     if table.action.is_invalidate_cache
@@ -343,10 +359,12 @@ function! s:get_action_table(action_name, candidates, sources)"{{{
   for candidate in a:candidates
     let action_table = s:get_candidate_action_table(candidate, a:sources)
 
-    let action_name =
-          \ a:action_name ==# 'default' ?
-          \ unite#get_default_action(candidate.source, candidate.kind)
-          \ : a:action_name
+    let action_name = a:action_name
+    if action_name ==# 'default'
+      " Get default action.
+      let action_name = unite#get_default_action(
+            \ candidate.source, candidate.kind)
+    endif
 
     if !has_key(action_table, action_name)
       call unite#util#print_error(candidate.abbr . '(' . candidate.source . ')')
@@ -541,7 +559,8 @@ function! s:print_candidate()"{{{
   endif
 
   let candidate = unite#get_current_candidate()
-  echo candidate.word
+  echo 'abbr: ' . candidate.abbr
+  echo 'word: ' . candidate.word
 endfunction"}}}
 function! s:insert_selected_candidate()"{{{
   if line('.') <= unite#get_current_unite().prompt_linenr
@@ -577,17 +596,23 @@ function! unite#mappings#_quick_match(is_choose)"{{{
 
   let unite = unite#get_current_unite()
 
-  if has_key(quick_match_table, char)
-        \ && quick_match_table[char] < len(unite.candidates)
-    let candidates = [ unite.candidates[quick_match_table[char]] ]
-    if a:is_choose
-      call unite#mappings#_choose_action(candidates)
-    else
-      call unite#mappings#do_action(
-            \ unite.context.default_action, candidates)
-    endif
-  else
+  if !has_key(quick_match_table, char)
+        \ || quick_match_table[char] >= len(unite.candidates)
     call unite#util#print_error('Canceled.')
+    return
+  endif
+
+  let candidate = unite.candidates[quick_match_table[char]]
+  if candidate.is_dummy
+    call unite#util#print_error('Canceled.')
+    return
+  endif
+
+  if a:is_choose
+    call unite#mappings#_choose_action([candidate])
+  else
+    call unite#mappings#do_action(
+          \ unite.context.default_action, [candidate])
   endif
 endfunction"}}}
 function! s:input_directory()"{{{
@@ -598,6 +623,10 @@ endfunction"}}}
 function! s:loop_cursor_down(is_skip_not_matched)"{{{
   let is_insert = mode() ==# 'i'
   let prompt_linenr = unite#get_current_unite().prompt_linenr
+
+  if line('.') <= prompt_linenr && !is_insert
+    return 'j'
+  endif
 
   if line('.') == line('$')
     " Loop.
@@ -639,11 +668,15 @@ function! s:loop_cursor_up(is_skip_not_matched)"{{{
   let prompt_linenr = unite#get_current_unite().prompt_linenr
 
   if line('.') <= prompt_linenr
-    " Loop.
-    if is_insert
-      return "\<C-End>\<Home>"
+    if is_insert || line('.') <= 2
+      " Loop.
+      if is_insert
+        return "\<C-End>\<Home>"
+      else
+        return 'G'
+      endif
     else
-      return 'G'
+      return 'k'
     endif
   endif
 

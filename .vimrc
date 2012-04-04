@@ -400,8 +400,9 @@ inoreabbrev di <div style="text-align:center;"><CR><CR></div><UP><C-R>=Eatchar('
 inoreabbrev jc onClick="return confirm('Do you really delete it?')"<C-R>=Eatchar('\s')<CR>
 inoreabbrev fs <input type="submit" value="submit"><C-R>=Eatchar('\s')<CR>
 
-
-
+"vimfiler prefix key
+nnoremap [vimfiler] <Nop>
+nmap <Space>e :VimFiler<CR>
 
 "unite prefix key.
 nnoremap [unite] <Nop>
