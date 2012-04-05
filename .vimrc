@@ -21,7 +21,9 @@ filetype plugin on
 "カラースキーマをダウンロードしたら「$HOME/vimfiles/colors/」以下に配置してください。
 "カラースキーマを設定
 "colorscheme zenburn
-colorscheme desert
+"colorscheme desert
+"colorscheme evening
+colorscheme wombat
 
 " ポップアップメニューのカラーを設定
 hi Pmenu guibg=#666666
@@ -48,6 +50,9 @@ autocmd BufNewFile *.html    0r ~/.vim/skel/sample.html
 
 " インデントの種類(manual,indent,expr,marker,syntax,diff)
 "set foldmethod=indent
+
+" コードの色付け
+set syntax=on
 
 " 貼付けの自動インデント無効(短縮入力無効)
 " set paste
@@ -135,8 +140,12 @@ set wildmenu
 set hidden
 
 " tab文字等を視覚化
-set list
-set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
+"set list
+"set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
+
+" 自主規制解除
+set modifiable
+set write
 
 " ネットワーク設定
 set nocp
@@ -209,6 +218,7 @@ nnoremap <silent> [mapping]w :<ESC>:w<CR>
 
 " バッファを閉じる
 nnoremap <silent> [mapping]q :<ESC>:q<CR>
+nnoremap <silent> [mapping]qq :<ESC>:q!<CR>
 
 " sourceの再読み込み
 nnoremap <silent> [mapping]ss <ESC>:w<CR>:source ~/.vimrc<CR>
@@ -362,47 +372,44 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " 補完
 """"""""""""""""""""""""""""""""""""""""""""""""""
-inoreabbrev pa ()<LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev cu {}<LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev br []<LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev da ""<LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev si ''<LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev ed # editer seki <ESC>a<C-R>=Eatchar('\s')<CR>
-inoreabbrev au #<Space>auther<Space>seki <ESC><C-R>=Eatchar('\s')<CR>
-inoreabbrev to #<Space>[TODO]<Space>seki <ESC><C-R>=Eatchar('\s')<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""
+inoreabbrev zpa ()<LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zcu {}<LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zbr []<LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zya <><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zda ""<LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zsi ''<LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zed # editer seki <ESC>a<C-R>=Eatchar('\s')<CR>
+inoreabbrev zau #<Space>auther<Space>seki <ESC><C-R>=Eatchar('\s')<CR>
+inoreabbrev zto #<Space>[TODO]<Space>seki <ESC><C-R>=Eatchar('\s')<CR>
+""""""""""""z""""""""""""""""""""""""""""""""""""""
 " php
-""""""""""""""""""""""""""""""""""""""""""""""""""
-"inoreabbrev if <ESC>:a!<CR>if($ ){<CR><CR>}//if<CR>.<CR><UP><UP>f$i
-inoreabbrev if if($){<CR><CR>}//if<ESC><<kk0f$a<C-R>=Eatchar('\s')<CR>
-inoreabbrev fe foreach($ =>$k as $v){<CR><CR>}//foreach<ESC>kk0f$a<C-R>=Eatchar('\s')<CR>
-inoreabbrev fo for($i=0;$i<10;$i++){<CR><CR>}//for<UP><C-R>=Eatchar('\s')<CR>
-inoreabbrev ar array(""=>"");<C-R>=Eatchar('\s')<CR><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev ph <?php  ?><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev pe <?php e(); ?><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev fu function (){<CR><CR><CR>}//function<UP><UP><UP><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""z""""""""""""""""""""""""""""""""""""""
+"inoreabbrevz if <ESC>:a!<CR>if($ ){<CR><CR>}//if<CR>.<CR><UP><UP>f$i
+inoreabbrev zif if($){<CR><CR>}//if<ESC><<kk0f$a<C-R>=Eatchar('\s')<CR>
+inoreabbrev zfe foreach($ =>$k as $v){<CR><CR>}//foreach<ESC>kk0f$a<C-R>=Eatchar('\s')<CR>
+inoreabbrev zfo for($i=0;$i<10;$i++){<CR><CR>}//for<UP><C-R>=Eatchar('\s')<CR>
+inoreabbrev zar array(""=>"");<C-R>=Eatchar('\s')<CR><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zph <?php  ?><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zpe <?php e(); ?><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zfu function (){<CR><CR><CR>}//function<UP><UP><UP><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+""""""""""""z""""""""""""""""""""""""""""""""""""""
 " cake
-""""""""""""""""""""""""""""""""""""""""""""""""""
-inoreabbrev lm $this->loadModel('');<LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev fi <?php e($form->input(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev fh <?php e($form->hidden(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev re $this->redirect("");<LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev se $this->set(compact(""));<LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""z""""""""""""""""""""""""""""""""""""""
+inoreabbrev zlm $this->loadModel('');<LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zfi <?php e($form->input(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zfh <?php e($form->hidden(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zre $this->redirect("");<LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zse $this->set(compact(""));<LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+""""""""""""z""""""""""""""""""""""""""""""""""""""
 " html
-""""""""""""""""""""""""""""""""""""""""""""""""""
-inoreabbrev pi <?php if($){ ?><CR><?php }else{ ?><CR><?php }//if ?><UP><UP><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
-inoreabbrev hi <input type="submit" name="submit" value="送信"><C-R>=Eatchar('\s')<CR>
-inoreabbrev ta <table class="sheet"><CR><tr><CR><td></td><CR></tr><CR><table><ESC>kk0t/ha<C-R>=Eatchar('\s')<CR>
-inoreabbrev td <td><C-R>=Eatchar('\s')<CR>
-inoreabbrev di <div style="text-align:center;"><CR><CR></div><UP><C-R>=Eatchar('\s')<CR>
-inoreabbrev jc onClick="return confirm('Do you really delete it?')"<C-R>=Eatchar('\s')<CR>
-inoreabbrev fs <input type="submit" value="submit"><C-R>=Eatchar('\s')<CR>
-
-"vimfiler prefix key
-nnoremap [vimfiler] <Nop>
-nmap <Space>e :VimFiler<CR>
+""""""""""""z""""""""""""""""""""""""""""""""""""""
+inoreabbrev zpi <?php if($){ ?><CR><?php }else{ ?><CR><?php }//if ?><UP><UP><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zhi <input type="submit" name="submit" value="送信"><C-R>=Eatchar('\s')<CR>
+inoreabbrev zta <table class="sheet"><CR><tr><CR><td></td><CR></tr><CR><table><ESC>kk0t/ha<C-R>=Eatchar('\s')<CR>
+inoreabbrev ztd <td><C-R>=Eatchar('\s')<CR>
+inoreabbrev zdi <div style="text-align:center;"><CR><CR></div><UP><C-R>=Eatchar('\s')<CR>
+inoreabbrev zjc onClick="return confirm('Do you really delete it?')"<C-R>=Eatchar('\s')<CR>
+inoreabbrev zfs <input type="submit" value="submit"><C-R>=Eatchar('\s')<CR>
 
 "unite prefix key.
 nnoremap [unite] <Nop>
@@ -455,6 +462,11 @@ function! s:unite_my_settings()"{{{
         " 単語単位からパス単位で削除するように変更
         imap <buffer> <C-w> <Plug>(unite_delete_backward_path)
 endfunction"}}}
+
+"vimfiler
+nnoremap <silent> [unite]e :VimFiler<CR>
+let g:vimfiler_as_default_explorer=1
+let g:vimfiler_safe_mode_by_default=0
 
 "twitvim prefix key.
 nnoremap [twitvim] <Nop>
