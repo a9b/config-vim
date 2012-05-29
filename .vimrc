@@ -54,6 +54,15 @@ autocmd BufNewFile *.html    0r ~/.vim/skel/sample.html
 " コードの色付け
 set syntax=on
 
+" カレント行色付け
+"set cursorline
+highlight CursorLine ctermbg=Black
+highlight CursorLine ctermfg=Blue
+" カレント列色付け
+"set cursorcolumn
+"highlight CursorColumn ctermbg=Blue
+"highlight CursorColumn ctermfg=Green
+
 " 貼付けの自動インデント無効(短縮入力無効)
 " set paste
 
@@ -108,8 +117,8 @@ set tabstop=2
 
 " 補完候補がコマンドラインのすぐ上の行に表示
 set wildmenu
+set wildmode=list:full
 
-" ファイル操作に関する設定:
 " バックアップファイルを作成しない (コメント or コメントアウト)
 set nobackup
 set nowritebackup
@@ -143,6 +152,8 @@ set hidden
 "set list
 "set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
 
+" /?の検索で大文字と小文字を無視
+set ic
 " 自主規制解除
 set modifiable
 set write
@@ -238,6 +249,7 @@ map ,d :r! date "+\%Y/\%m/\%d \%H:\%M:\%S" <CR> k J A
 " 関数
 map ,f :vimgrep /function /j % <LEFT><LEFT><LEFT><LEFT><LEFT>
 au QuickfixCmdPost vimgrep cw
+nnoremap <silent> [mapping]f :vs<CR>:vimgrep /^\s*function / %<CR>:cw<CR><C-w>k:q<CR><C-w>l/[a-z]*
 
 " homeに移動
 map ,h :cd $HOME <CR>:tabnew <CR>:E <CR>
@@ -246,7 +258,7 @@ map ,h :cd $HOME <CR>:tabnew <CR>:E <CR>
 map ,o :cd %:h <CR>:tabnew <CR>:E <CR>
 
 " 置換
-map ,r :%s///g <LEFT><LEFT><LEFT><LEFT>
+nnoremap <silent> [mapping]r :%s///g <LEFT><LEFT><LEFT><LEFT>
 
 " 新規タブ
 map ,t :tabnew
@@ -400,6 +412,7 @@ inoreabbrev zfi <?php e($form->input(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT>
 inoreabbrev zfh <?php e($form->hidden(""));?><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
 inoreabbrev zre $this->redirect("");<LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
 inoreabbrev zse $this->set(compact(""));<LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
+inoreabbrev zcl ClassRegistry::init('')->find("all");<LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><LEFT><C-R>=Eatchar('\s')<CR>
 """"""""""""z""""""""""""""""""""""""""""""""""""""
 " html
 """"""""""""z""""""""""""""""""""""""""""""""""""""
@@ -464,7 +477,8 @@ function! s:unite_my_settings()"{{{
 endfunction"}}}
 
 "vimfiler
-nnoremap <silent> [unite]e :VimFiler<CR>
+nnoremap <silent> [unite]e :VimFiler -split -simple -winminwidth=50 -winwidth=10 -no-quit<CR>
+nnoremap <silent> [unite]o :VimFilerBufferDir -split -simple -winminwidth=50 -winwidth=10 -no-quit<CR>
 let g:vimfiler_as_default_explorer=1
 let g:vimfiler_safe_mode_by_default=0
 
